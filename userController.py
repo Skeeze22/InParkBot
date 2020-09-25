@@ -34,7 +34,7 @@ class userController():
                 break
             if self.check_message(self.words.rides):
                 pass
-                break
+                self.check_rails(user_id, 0)
             if self.check_message(self.words.apps):
                 pass
                 break
@@ -64,3 +64,64 @@ class userController():
     def send_photo_message(self, keyboard, photo, user_id):
         vk.messages.send(message=photo.description, peer_id=user_id, random_id=get_random_id(), attachment=photo.photo,
                          keyboard=keyboard)
+
+    def check_rails(self, user_id, index):
+        keyboard = self.get_rails_keyboard(index)
+        vk.messages.send(message=self.scenario.rails_choise, peer_id=user_id, random_id=get_random_id(),
+                         keyboard=keyboard)
+        for event in longpoll.listen():
+            self.data.text = event.obj.text
+            self.data.user_id = event.obj.from_id
+            self.data.bot_user_id = user_id
+            if self.check_message(bot_message=self.words.rails[index]):
+                pass
+            if self.check_message(bot_message=self.words.rails[index +1]):
+                pass
+            if self.check_message(bot_message=self.words.rails[index + 2]):
+                pass
+            if self.check_message(bot_message=self.words.rails[index + 3]):
+                pass
+            if self.check_message(bot_message=self.words.rails[index + 4]):
+                pass
+            if self.push_system_button(self.words.next):
+                self.check_rails(user_id, index + 5)
+            if self.push_system_button(self.words.back):
+                self.check_rails(user_id, index - 5)
+            if self.push_system_button(self.words.in_menu):
+                self.menu(user_id)
+
+    def push_system_button(self, message):
+        return message == self.data.text and self.data.user_id == self.data.bot_user_id and self.words.start != self.data.text
+
+    def get_rails_keyboard(self, start):
+        keyboard = VkKeyboard(one_time=True)
+        i = start
+        while i < start + 5:
+            if i < len(self.words.rails):
+                keyboard.add_button(self.words.rails[i], color=VkKeyboardColor.POSITIVE)
+                keyboard.add_line()
+                i = i + 1
+            else:
+                break
+        if start + 5 < len(self.words.rails) and start - 5 >= 0:
+            print(1)
+            keyboard.add_button(self.words.back, color=VkKeyboardColor.POSITIVE)
+            keyboard.add_button(self.words.next, color=VkKeyboardColor.POSITIVE)
+            keyboard.add_line()
+            keyboard.add_button(self.words.in_menu, color=VkKeyboardColor.POSITIVE)
+        if start - 5 >= 0 and start + 5 >= len(self.words.rails):
+            print(2)
+            keyboard.add_button(self.words.back, color=VkKeyboardColor.POSITIVE)
+            keyboard.add_line()
+            keyboard.add_button(self.words.in_menu, color=VkKeyboardColor.POSITIVE)
+        if start + 5 < len(self.words.rails) and start == 0:
+            print(3)
+            keyboard.add_button(self.words.next, color=VkKeyboardColor.POSITIVE)
+            keyboard.add_line()
+            keyboard.add_button(self.words.in_menu, color=VkKeyboardColor.POSITIVE)
+        if start + 5 >= len(self.words.rails) and start - 5 <= 0:
+            keyboard.add_button(self.words.in_menu, color=VkKeyboardColor.POSITIVE)
+
+        return keyboard.get_keyboard()
+
+
