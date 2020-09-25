@@ -6,6 +6,7 @@ from models.DataFromUser import DataFromUser
 from models.PhotoMessage import PhotoMessage
 from DataClasses.RailsData import rails_list
 from DataClasses.FoodData import  food_data
+from DataClasses.KvestData import kvests
 
 class userController():
 
@@ -28,7 +29,7 @@ class userController():
                 self.chech_info(user_id)
                 break
             if self.check_message(self.words.events):
-                pass
+                self.check_rails(user_id, 0,kvests, self.words.kvests, self.scenario.kvests)
                 break
             if self.check_message(self.words.kafe):
                 self.check_rails(user_id , 0,food_data ,self.words.food, self.scenario.food)
