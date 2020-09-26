@@ -1,3 +1,5 @@
+from vk_api.bot_longpoll import VkBotEventType
+
 from config import longpoll, vk, vk_session, get_random_id
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from Scenario import Scenario
@@ -25,20 +27,22 @@ class userController():
             self.data.user_id = event.obj.from_id
             self.data.text = event.obj.text
             self.data.bot_user_id = user_id
-            if self.check_message(self.words.park_ifro):
+            if event.type == VkBotEventType.MESSAGE_NEW and  self.check_message(self.words.park_ifro):
                 self.chech_info(user_id)
                 break
-            if self.check_message(self.words.events):
+            if event.type == VkBotEventType.MESSAGE_NEW and self.check_message(self.words.events):
                 self.check_rails(user_id, 0,kvests, self.words.kvests, self.scenario.kvests)
                 break
-            if self.check_message(self.words.kafe):
+            if event.type == VkBotEventType.MESSAGE_NEW and self.check_message(self.words.kafe):
                 self.check_rails(user_id , 0,food_data ,self.words.food, self.scenario.food)
                 break
-            if self.check_message(self.words.rides):
+            if event.type == VkBotEventType.MESSAGE_NEW and  self.check_message(self.words.rides):
                 self.check_rails(user_id, 0, rails_list, self.words.rails, self.scenario.rails_choise)
                 break
-            if self.check_message(self.words.apps):
+            if event.type == VkBotEventType.MESSAGE_NEW and self.check_message(self.words.apps):
                 self.send_link(user_id)
+                break
+            if event.type == VkBotEventType.MESSAGE_NEW and self.data.text == self.words.start and self.data.user_id ==  self.data.bot_user_id:
                 break
 
     def get_start_keyboard(self):
@@ -127,6 +131,8 @@ class userController():
                 self.check_rails(user_id, index - 5, data,words, mess)
             if self.push_system_button(self.words.in_menu):
                 self.menu(user_id)
+            else:
+                break
 
     def send_link(self, user_id):
         vk.messages.send(message=self.scenario.apps, peer_id=user_id, random_id=get_random_id())
